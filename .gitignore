@@ -1,3 +1,6 @@
+models/*
+files/*
+
 # Logs
 logs
 *.log

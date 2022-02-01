@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 import multer from "multer";
 import { setUp } from "./lib/setup";
-import { testConvert } from "./lib/converter";
+import { convert, testConvert } from "./lib/converter/converter";
+import cors from 'cors'
 
 const app = express();
 const port = 5000;
@@ -18,24 +19,35 @@ const files_dir = path.join(__dirname, FILES_DIR_NAME);
 
 const upload = multer({ dest: files_dir });
 
+app.use(cors())
+
 app.post("/convert/", upload.single("midi"), (req, res) => {
   console.log("[Convert] received midi");
 
   let timerStart = process.hrtime();
 
-  const output_path = path.join(files_dir, req.file.filename + ".wav");
+  const newDirPath = req.file.path + "_project"
+  fs.mkdirSync(newDirPath)
+  const newFilepath = path.join(newDirPath, req.file.filename)
+  fs.renameSync(req.file.path, newFilepath)
 
-  let convert_process = testConvert(req.file, output_path);
+  const output_path = path.join(newDirPath, req.file.filename + ".wav");
+
+  let convert_process = convert(req.file.filename, newDirPath, path.join(MODELS_DIR_NAME, "midi2params"))
 
   convert_process.on("exit", () => {
     console.log(`[Convert] Finished in ${process.hrtime(timerStart)} ms`);
+
     res.sendFile(output_path);
   });
 
   res.on("finish", () => {
-    fs.rm(req.file.path, () => {});
-    fs.rm(output_path, () => {});
+    fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
   });
+  res.on("error", e => {
+    console.log(e)
+    fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
+  })
 });
 
-app.listen(port, () => {});
+app.listen(port, () => { });
