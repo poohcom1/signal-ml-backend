@@ -1,0 +1,131 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Signal-ml Manifest",
+    "description": "Configs setting for a signal-ml model",
+    "type": "object",
+    "properties": {
+        "name": {
+            "description": "Display name of model",
+            "type": "string"
+        },
+        "format": {
+            "description": "File format for input data",
+            "type": "string",
+            "enum": [
+                "midi",
+                "musicxml"
+            ]
+        },
+        "description": {
+            "description": "Description of model",
+            "type": "string"
+        },
+        "parameters": {
+            "description": "Variables used in the run commands.",
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "const": "string"
+                                },
+                                "default": {
+                                    "type": "string"
+                                },
+                                "private": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the value is hidden client side."
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "default"
+                            ],
+                            "additionalProperties": false
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "enum": [
+                                        "int",
+                                        "float"
+                                    ]
+                                },
+                                "default": {
+                                    "type": "number"
+                                },
+                                "min": {
+                                    "type": "number",
+                                    "description": "The inclusive minimum for this number property."
+                                },
+                                "max": {
+                                    "type": "number",
+                                    "description": "The inclusive maximum for this number property."
+                                },
+                                "step": {
+                                    "type": "number",
+                                    "description": "The increment amount."
+                                },
+                                "private": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the value is hidden client side."
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "default"
+                            ],
+                            "additionalProperties": false
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "const": "enum",
+                                    "description": "A list of possible strings to be shown"
+                                },
+                                "default": {
+                                    "type": "string"
+                                },
+                                "enum": {
+                                    "type": "array"
+                                },
+                                "private": {
+                                    "type": "boolean",
+                                    "description": "Whether or not the value is hidden client side."
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "default",
+                                "enum"
+                            ],
+                            "additionalProperties": false
+                        },
+                        {
+                            "type": "string",
+                            "description": "A string property to inject into the script. Specified value is treated as the default."
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "script:": {
+            "description": "Array of commands to run",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "required": [
+        "name",
+        "format",
+        "script"
+    ]
+}
