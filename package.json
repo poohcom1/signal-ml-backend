@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env PORT=9000 ts-node app.ts",
     "serve": "cross-env PORT=5000 nodemon --exec npx ts-node app.ts",
-    "test": "jest"
+    "test": "jest",
+    "tsc": "tsc app.ts"
   },
   "repository": {
     "type": "git",

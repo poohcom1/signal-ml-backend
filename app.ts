@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("/models", (req, res) => {
-  const models = fs.readdirSync(model_dir);
+  const models = fs.readdirSync(model_dir).reverse();
 
   const configs = {};
 
@@ -80,14 +80,10 @@ app.post("/convert/:model", upload.single("midi"), (req, res) => {
   });
 
   res.on("finish", () => {
-    if (process.env.DEBUG) {
-      fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
-    }
+    fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
   });
   res.on("error", (e) => {
-    if (process.env.DEBUG) {
-      fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
-    }
+    fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
   });
 });
 
