@@ -20,6 +20,11 @@ const files_dir = path.join(__dirname, FILES_DIR_NAME);
 const upload = multer({ dest: files_dir });
 
 app.use(cors());
+app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+  res.send("hi")
+})
 
 app.get("/models", (req, res) => {
   const models = fs.readdirSync(model_dir);

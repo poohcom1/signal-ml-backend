@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import YAML from "yaml";
 import { ChildProcess, exec } from "child_process";
+import { execAsync } from "../command/asyncExec";
 
 const MODEL_MANIFEST_NAME = "manifest.sml.yaml";
 const FILE_NAME_PARAM = "BASENAME";
@@ -120,6 +121,27 @@ export function convert(
       if (stderr) console.error(`[stderr] ${stderr}`);
     }
   );
+}
+
+export async function asyncConvert(
+  filename: string,
+  fileDir: string,
+  modelDir: string,
+  options: Record<string, string | number | boolean>,
+  data: { bpm: number }
+): Promise<void> {
+  const configs = parse_configs(modelDir);
+
+  inject_parameters(configs.script, options, filename, fileDir, data.bpm);
+
+  console.log(modelDir)
+
+  await execAsync(`cd ${modelDir}`)
+
+  for (const command of configs.script) {
+    const { stderr } = await execAsync(command);
+    console.log(stderr)
+  }
 }
 
 function inject_parameters(
