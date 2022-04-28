@@ -1,5 +1,8 @@
 models/*/**
 files/*
+build/**
+
+log.txt
 
 # Logs
 logs

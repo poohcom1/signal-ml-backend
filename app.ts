@@ -9,13 +9,15 @@ import cors from "cors";
 const app = express();
 const port = process.env.PORT;
 
+const PROJECT_DIR = process.cwd()
+
 const FILES_DIR_NAME = "files";
 const MODELS_DIR_NAME = "models";
 
 setUp([FILES_DIR_NAME, MODELS_DIR_NAME], ".");
 
-const model_dir = path.join(__dirname, MODELS_DIR_NAME);
-const files_dir = path.join(__dirname, FILES_DIR_NAME);
+const model_dir = path.join(PROJECT_DIR, MODELS_DIR_NAME);
+const files_dir = path.join(PROJECT_DIR, FILES_DIR_NAME);
 
 const upload = multer({ dest: files_dir });
 
@@ -26,8 +28,13 @@ app.get("/", (req, res) => {
   res.send("hi")
 })
 
+function getModels() {
+  return fs.readdirSync(model_dir)
+          .filter(dir => fs.lstatSync(path.join(model_dir, dir)).isDirectory())
+}
+
 app.get("/models", (req, res) => {
-  const models = fs.readdirSync(model_dir).reverse();
+  const models = getModels()
 
   const configs = {};
 
@@ -47,8 +54,6 @@ app.post("/convert/:model", upload.single("midi"), (req, res) => {
   const bpm = req.body.bpm;
 
   let timerStart = process.hrtime();
-
-  console.log(req.file.path);
 
   // Setup files
   const newDirPath = req.file.path + "_project";
@@ -83,17 +88,13 @@ app.post("/convert/:model", upload.single("midi"), (req, res) => {
     fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
   });
   res.on("error", (e) => {
-    fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
+    // fs.rmSync(req.file.path + "_project", { recursive: true, force: true });
   });
 });
 
 app.listen(port, () => {
   // Check configs
-  const models = fs.readdirSync(model_dir);
-
-  models.forEach((model) => {
-    parse_configs(path.join(MODELS_DIR_NAME, model), true);
-  });
+  const models = getModels()
 
   console.info(`[Info] Loaded ${models.length} models.`);
 });

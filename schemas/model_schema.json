@@ -20,6 +20,10 @@
             "description": "Description of model",
             "type": "string"
         },
+        "link": {
+            "description": "Optional url to model website",
+            "type": "string"
+        },
         "parameters": {
             "description": "Variables used in the run commands.",
             "type": "object",
